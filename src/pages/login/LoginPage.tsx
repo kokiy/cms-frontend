@@ -3,7 +3,7 @@ import { Form, Input, Button, Card, notification } from 'antd'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { storeSelector } from '../../stores'
-import { authService } from '../../services/authService'
+import { apiClient } from '@/client/setup'
 
 export function LoginPage() {
   const intl = useIntl()
@@ -15,7 +15,11 @@ export function LoginPage() {
   const onFinish = async (values: { username: string; password: string }) => {
     setLoading(true)
     try {
-      const response = await authService.login(values)
+      const response = await apiClient.post<{ token: string; user: any }>(
+        '/v1/auth/login',
+        values,
+        { skipAuth: true },
+      )
       setToken(response.token)
       setUser(response.user)
       notification.success({
