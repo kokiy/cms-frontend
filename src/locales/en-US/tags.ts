@@ -1,0 +1,17 @@
+export default {
+  'tags.title': 'Tags Management',
+  'tags.create': 'Create Tag',
+  'tags.edit': 'Edit Tag',
+  'tags.name': 'Tag Name',
+  'tags.name.placeholder': 'Enter tag name',
+  'tags.name.required': 'Tag name is required',
+  'tags.name.duplicate': 'Tag name already exists',
+  'tags.postCount': 'Post Count',
+  'tags.createdAt': 'Created At',
+  'tags.noData': 'No tags',
+  'tags.deleteConfirm': 'Are you sure you want to delete this tag?',
+  'tags.deleteConfirmMessage': 'Deleting a tag will not affect associated posts.',
+  'tags.createSuccess': 'Tag created successfully',
+  'tags.updateSuccess': 'Tag updated successfully',
+  'tags.deleteSuccess': 'Tag deleted successfully',
+}

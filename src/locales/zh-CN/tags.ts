@@ -1,0 +1,17 @@
+export default {
+  'tags.title': '标签管理',
+  'tags.create': '新建标签',
+  'tags.edit': '编辑标签',
+  'tags.name': '标签名称',
+  'tags.name.placeholder': '请输入标签名称',
+  'tags.name.required': '请输入标签名称',
+  'tags.name.duplicate': '标签名称已存在',
+  'tags.postCount': '文章数',
+  'tags.createdAt': '创建时间',
+  'tags.noData': '暂无标签',
+  'tags.deleteConfirm': '确定要删除这个标签吗？',
+  'tags.deleteConfirmMessage': '删除标签不会影响已关联的文章。',
+  'tags.createSuccess': '标签创建成功',
+  'tags.updateSuccess': '标签更新成功',
+  'tags.deleteSuccess': '标签删除成功',
+}
