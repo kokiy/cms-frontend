@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { LoginPage } from '../pages/login/LoginPage'
+import { RegisterPage } from '../pages/login/RegisterPage'
 import { PostsPage } from '../pages/posts/PostsPage'
 import { TagsPage } from '../pages/tags/TagsPage'
 import { MainLayout } from '../components/layout'
@@ -7,12 +8,17 @@ import { ProtectedRoute } from './ProtectedRoute'
 import { storeSelector } from '../stores'
 
 export function useAppRouter() {
-  const isAuthenticated = storeSelector.use.isAuthenticated()
+  const token = storeSelector.use.token()
+  const isAuthenticated = !!token
 
   return createBrowserRouter([
     {
       path: '/login',
       element: isAuthenticated ? <Navigate to="/posts" replace /> : <LoginPage />,
+    },
+    {
+      path: '/register',
+      element: isAuthenticated ? <Navigate to="/posts" replace /> : <RegisterPage />,
     },
     {
       path: '/',

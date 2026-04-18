@@ -21,6 +21,7 @@ const useStore = create<AllState>()(
       //  skipHydration: true,
       partialize: (state) => ({
         locale: state.locale,
+        token: state.token,
       }),
       version: 0,
     },

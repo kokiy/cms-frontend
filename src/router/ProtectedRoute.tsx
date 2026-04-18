@@ -7,7 +7,8 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const location = useLocation()
-  const isAuthenticated = storeSelector.use.isAuthenticated()
+  const token = storeSelector.use.token()
+  const isAuthenticated = !!token
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />

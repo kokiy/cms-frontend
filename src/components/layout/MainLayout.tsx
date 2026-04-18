@@ -7,16 +7,17 @@ const { Content } = Layout
 
 export function MainLayout() {
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ height: '100vh' }}>
       <Sidebar />
-      <Layout>
+      <Layout style={{ overflow: 'hidden' }}>
         <Header />
         <Content
           style={{
             margin: '24px',
             padding: '24px',
-            minHeight: 280,
             background: '#f5f5f5',
+            overflow: 'auto',
+            flex: 1,
           }}
         >
           <Outlet />

@@ -4,8 +4,7 @@ export default defineConfig({
   input: 'http://localhost:3000/api-docs-json',
   output: {
     path: 'src/client',
-    format: 'prettier',
-    lint: 'oxlint',
+    postProcess: ['prettier', 'oxlint'],
   },
   client: '@hey-api/client-fetch',
   types: {

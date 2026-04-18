@@ -9,7 +9,6 @@ export interface User {
 interface AuthSlice {
   token: string | null
   user: User | null
-  isAuthenticated: boolean
   setToken: (token: string) => void
   setUser: (user: User) => void
   clearAuth: () => void
@@ -18,19 +17,9 @@ interface AuthSlice {
 const createAuthSlice: StateCreator<AuthSlice> = (set) => ({
   token: null,
   user: null,
-  isAuthenticated: false,
-  setToken: (token) =>
-    set({
-      token,
-      isAuthenticated: !!token,
-    }),
+  setToken: (token) => set({ token }),
   setUser: (user) => set({ user }),
-  clearAuth: () =>
-    set({
-      token: null,
-      user: null,
-      isAuthenticated: false,
-    }),
+  clearAuth: () => set({ token: null, user: null }),
 })
 
 export default createAuthSlice

@@ -1,41 +1,46 @@
-import { useState } from 'react'
-import { Form, Input, Button, Card, notification } from 'antd'
+import { Form, Input, Button, Card, Typography } from 'antd'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { storeSelector } from '../../stores'
-import { apiClient } from '@/client/setup'
+import { useMutation } from '@tanstack/react-query'
+import { authControllerLogin } from '@/client'
+import { notification } from 'antd'
+import { storeSelector } from '@/stores'
+
+const { Link } = Typography
 
 export function LoginPage() {
   const intl = useIntl()
   const navigate = useNavigate()
   const setToken = storeSelector.use.setToken()
-  const setUser = storeSelector.use.setUser()
-  const [loading, setLoading] = useState(false)
 
-  const onFinish = async (values: { username: string; password: string }) => {
-    setLoading(true)
-    try {
-      const response = await apiClient.post<{ token: string; user: any }>(
-        '/v1/auth/login',
-        values,
-        { skipAuth: true },
-      )
-      setToken(response.token)
-      setUser(response.user)
+  const loginMutation = useMutation({
+    mutationFn: async (values: { username: string; password: string }) => {
+      const response = await authControllerLogin({
+        body: values,
+        throwOnError: true,
+      })
+      setToken(response.data.data.access_token)
+
+      // setUser(user)
+    },
+    onSuccess: () => {
       notification.success({
         message: intl.formatMessage({ id: 'login.success' }),
       })
       setTimeout(() => {
         navigate('/posts')
       }, 500)
-    } catch (error) {
+    },
+    onError: (error) => {
       notification.error({
         message: intl.formatMessage({ id: 'login.failed' }),
         description: error instanceof Error ? error.message : undefined,
       })
-    } finally {
-      setLoading(false)
-    }
+    },
+  })
+
+  const onFinish = (values: { username: string; password: string }) => {
+    loginMutation.mutate(values)
   }
 
   return (
@@ -52,6 +57,7 @@ export function LoginPage() {
         <Form name="login" onFinish={onFinish} autoComplete="off" size="large">
           <Form.Item
             name="username"
+            label={intl.formatMessage({ id: 'login.username' })}
             rules={[
               {
                 required: true,
@@ -64,6 +70,7 @@ export function LoginPage() {
 
           <Form.Item
             name="password"
+            label={intl.formatMessage({ id: 'login.password' })}
             rules={[
               {
                 required: true,
@@ -77,10 +84,16 @@ export function LoginPage() {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" block loading={loading}>
+            <Button type="primary" htmlType="submit" block loading={loginMutation.isPending}>
               {intl.formatMessage({ id: 'login.submit' })}
             </Button>
           </Form.Item>
+
+          <div style={{ textAlign: 'center' }}>
+            <Link onClick={() => navigate('/register')}>
+              {intl.formatMessage({ id: 'login.toRegister' })}
+            </Link>
+          </div>
         </Form>
       </Card>
     </div>
