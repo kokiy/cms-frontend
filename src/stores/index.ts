@@ -22,6 +22,7 @@ const useStore = create<AllState>()(
       partialize: (state) => ({
         locale: state.locale,
         token: state.token,
+        user: state.user,
       }),
       version: 0,
     },

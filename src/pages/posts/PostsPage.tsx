@@ -12,7 +12,7 @@ import {
   tagsControllerFindAll,
   type CreatePostDto,
   type UpdatePostDto,
-} from '@/client'
+} from '@/services'
 
 const { Search } = Input
 

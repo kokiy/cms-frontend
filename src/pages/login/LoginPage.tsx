@@ -2,7 +2,7 @@ import { Form, Input, Button, Card, Typography } from 'antd'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
-import { authControllerLogin } from '@/client'
+import { authControllerLogin } from '@/services'
 import { notification } from 'antd'
 import { storeSelector } from '@/stores'
 
@@ -12,6 +12,7 @@ export function LoginPage() {
   const intl = useIntl()
   const navigate = useNavigate()
   const setToken = storeSelector.use.setToken()
+  const setUser = storeSelector.use.setUser()
 
   const loginMutation = useMutation({
     mutationFn: async (values: { username: string; password: string }) => {
@@ -20,8 +21,7 @@ export function LoginPage() {
         throwOnError: true,
       })
       setToken(response.data.data.access_token)
-
-      // setUser(user)
+      setUser({ username: response.data.data.username, id: 'a' })
     },
     onSuccess: () => {
       notification.success({

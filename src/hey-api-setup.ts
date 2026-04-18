@@ -1,5 +1,5 @@
-import { client } from './client.gen'
-import { storeSelector } from '../stores'
+import { client } from './services/client.gen'
+import { storeSelector } from './stores'
 import { notification } from 'antd'
 
 export const setupApiClient = () => {

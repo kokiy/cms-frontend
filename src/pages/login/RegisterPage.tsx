@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Form, Input, Button, Card, notification, Typography } from 'antd'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { authControllerLogin, type LoginDto } from '@/client'
+import { authControllerLogin, type LoginDto } from '@/services'
 import { storeSelector } from '@/stores'
 
 const { Link } = Typography

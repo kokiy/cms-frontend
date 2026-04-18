@@ -10,7 +10,7 @@ import {
   tagsControllerRemove,
   type CreateTagDto,
   type UpdateTagDto,
-} from '@/client'
+} from '@/services'
 
 export function TagsPage() {
   const intl = useIntl()

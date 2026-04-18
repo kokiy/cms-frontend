@@ -51,6 +51,14 @@ export type LoginResponseDto = {
    * 访问令牌
    */
   access_token: string
+  /**
+   * 用户名
+   */
+  username: string
+  /**
+   * 角色
+   */
+  role: string
 }
 
 export type LoginDto = {
