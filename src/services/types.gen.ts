@@ -236,11 +236,11 @@ export type CreatePostDto = {
   /**
    * 分类 ID
    */
-  categoryId?: string
+  categoryId: string
   /**
    * 标签名称列表
    */
-  tags?: Array<string>
+  tags: Array<string>
 }
 
 export type UpdatePostDto = {
@@ -599,6 +599,24 @@ export type PostsControllerPublishResponses = {
 
 export type PostsControllerPublishResponse =
   PostsControllerPublishResponses[keyof PostsControllerPublishResponses]
+
+export type PostsControllerUnpublishData = {
+  body?: never
+  path: {
+    id: string
+  }
+  query?: never
+  url: '/api/v1/posts/{id}/unpublish'
+}
+
+export type PostsControllerUnpublishResponses = {
+  200: ApiResponseDto & {
+    data?: PostResponseDto
+  }
+}
+
+export type PostsControllerUnpublishResponse =
+  PostsControllerUnpublishResponses[keyof PostsControllerUnpublishResponses]
 
 export type TagsControllerFindAllData = {
   body?: never

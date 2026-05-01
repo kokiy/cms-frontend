@@ -22,4 +22,5 @@ export default {
   'common.home': '首页',
   'common.posts': '文章管理',
   'common.tags': '标签管理',
+  'common.categories': '分类管理',
 }

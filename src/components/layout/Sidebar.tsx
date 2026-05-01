@@ -1,5 +1,5 @@
 import { Menu, Layout } from 'antd'
-import { BookOutlined, TagsOutlined } from '@ant-design/icons'
+import { BookOutlined, TagsOutlined, FolderOutlined } from '@ant-design/icons'
 import { useIntl } from 'react-intl'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { storeSelector } from '../../stores'
@@ -23,6 +23,11 @@ export function Sidebar() {
       key: '/tags',
       icon: <TagsOutlined />,
       label: intl.formatMessage({ id: 'common.tags' }),
+    },
+    {
+      key: '/categories',
+      icon: <FolderOutlined />,
+      label: intl.formatMessage({ id: 'common.categories' }),
     },
   ]
 

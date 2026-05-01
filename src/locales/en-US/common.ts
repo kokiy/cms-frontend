@@ -23,4 +23,5 @@ export default {
   'common.home': 'Home',
   'common.posts': 'Posts',
   'common.tags': 'Tags',
+  'common.categories': 'Categories',
 }

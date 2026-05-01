@@ -31,6 +31,8 @@ import type {
   PostsControllerPublishResponses,
   PostsControllerRemoveData,
   PostsControllerRemoveResponses,
+  PostsControllerUnpublishData,
+  PostsControllerUnpublishResponses,
   PostsControllerUpdateData,
   PostsControllerUpdateResponses,
   TagsControllerCreateData,
@@ -277,6 +279,18 @@ export const postsControllerPublish = <ThrowOnError extends boolean = false>(
   (options.client ?? client).patch<PostsControllerPublishResponses, unknown, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/posts/{id}/publish',
+    ...options,
+  })
+
+/**
+ * 取消发布文章
+ */
+export const postsControllerUnpublish = <ThrowOnError extends boolean = false>(
+  options: Options<PostsControllerUnpublishData, ThrowOnError>,
+) =>
+  (options.client ?? client).patch<PostsControllerUnpublishResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/posts/{id}/unpublish',
     ...options,
   })
 

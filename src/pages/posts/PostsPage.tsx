@@ -3,16 +3,20 @@ import { Table, Button, Input, Select, Space, Tag, Form, Drawer, notification } 
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useIntl } from 'react-intl'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import {
   postsControllerFindAllManage,
   postsControllerCreate,
   postsControllerUpdate,
   postsControllerPublish,
+  postsControllerUnpublish,
   postsControllerRemove,
   tagsControllerFindAll,
+  categoriesControllerFindAll,
   type CreatePostDto,
   type UpdatePostDto,
   type PostResponseDto,
+  type CategoryResponseDto,
 } from '@/services'
 
 const { Search } = Input
@@ -41,6 +45,16 @@ export function PostsPage() {
     queryKey: ['tags'],
     queryFn: async () => {
       const response = await tagsControllerFindAll({
+        throwOnError: true,
+      })
+      return response.data.data
+    },
+  })
+
+  const categoryListQuery = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const response = await categoriesControllerFindAll({
         throwOnError: true,
       })
       return response.data.data
@@ -87,6 +101,19 @@ export function PostsPage() {
     },
   })
 
+  const unpublishMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await postsControllerUnpublish({
+        path: { id },
+        throwOnError: true,
+      })
+      return null
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] })
+    },
+  })
+
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       await postsControllerRemove({
@@ -107,6 +134,12 @@ export function PostsPage() {
   }
 
   const handleEdit = (post: PostResponseDto) => {
+    if (post.status === 'PUBLISHED') {
+      notification.warning({
+        message: '已发布的文章不能编辑',
+      })
+      return
+    }
     setEditingPost(post)
     form.setFieldsValue({
       title: post.title,
@@ -132,6 +165,16 @@ export function PostsPage() {
       onSuccess: () => {
         notification.success({
           message: intl.formatMessage({ id: 'posts.publish.success' }),
+        })
+      },
+    })
+  }
+
+  const handleUnpublish = (id: string) => {
+    unpublishMutation.mutate(id, {
+      onSuccess: () => {
+        notification.success({
+          message: intl.formatMessage({ id: 'posts.unpublish.success' }),
         })
       },
     })
@@ -174,12 +217,19 @@ export function PostsPage() {
       key: 'title',
     },
     {
+      title: intl.formatMessage({ id: 'posts.category' }),
+      dataIndex: 'category',
+      key: 'category',
+      render: (category: CategoryResponseDto | null | undefined) =>
+        category ? <Tag color="blue">{category.name}</Tag> : '-',
+    },
+    {
       title: intl.formatMessage({ id: 'posts.table.status' }),
       dataIndex: 'status',
       key: 'status',
       render: (status: string) => (
-        <Tag color={status === 'published' ? 'green' : 'orange'}>
-          {status === 'published'
+        <Tag color={status === 'PUBLISHED' ? 'green' : 'orange'}>
+          {status === 'PUBLISHED'
             ? intl.formatMessage({ id: 'posts.status.published' })
             : intl.formatMessage({ id: 'posts.status.draft' })}
         </Tag>
@@ -189,23 +239,37 @@ export function PostsPage() {
       title: intl.formatMessage({ id: 'posts.table.createdAt' }),
       dataIndex: 'created_at',
       key: 'createdAt',
-      render: (date: string) => new Date(date).toLocaleString(),
+      render: (date: string) => {
+        const parsed = dayjs(date)
+        return parsed.isValid() ? parsed.format('YYYY-MM-DD HH:mm:ss') : '-'
+      },
     },
     {
       title: intl.formatMessage({ id: 'posts.table.actions' }),
       key: 'actions',
       render: (_: unknown, record: PostResponseDto) => (
         <Space>
-          <Button type="text" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
-            {intl.formatMessage({ id: 'common.edit' })}
-          </Button>
-          {record.status === 'draft' && (
+          {record.status === 'DRAFT' && (
+            <Button type="text" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
+              {intl.formatMessage({ id: 'common.edit' })}
+            </Button>
+          )}
+          {record.status === 'DRAFT' && (
             <Button
               type="text"
               onClick={() => handlePublish(record.id)}
               loading={publishMutation.isPending}
             >
               {intl.formatMessage({ id: 'posts.publish' })}
+            </Button>
+          )}
+          {record.status === 'PUBLISHED' && (
+            <Button
+              type="text"
+              onClick={() => handleUnpublish(record.id)}
+              loading={unpublishMutation.isPending}
+            >
+              {intl.formatMessage({ id: 'posts.unpublish' })}
             </Button>
           )}
           <Button
@@ -268,7 +332,9 @@ export function PostsPage() {
             <Button
               type="primary"
               onClick={handleSubmit}
-              loading={createMutation.isPending || updateMutation.isPending}
+              loading={
+                createMutation.isPending || updateMutation.isPending || unpublishMutation.isPending
+              }
             >
               {intl.formatMessage({ id: 'common.save' })}
             </Button>
@@ -305,7 +371,16 @@ export function PostsPage() {
             />
           </Form.Item>
 
-          <Form.Item name="tags" label={intl.formatMessage({ id: 'posts.form.tags' })}>
+          <Form.Item
+            name="tags"
+            label={intl.formatMessage({ id: 'posts.form.tags' })}
+            rules={[
+              {
+                required: true,
+                message: intl.formatMessage({ id: 'posts.form.tags.required' }),
+              },
+            ]}
+          >
             <Select
               mode="multiple"
               placeholder={intl.formatMessage({ id: 'posts.form.tags.placeholder' })}
@@ -313,6 +388,26 @@ export function PostsPage() {
               options={(tagListQuery.data || []).map((tag) => ({
                 value: tag.id,
                 label: tag.name,
+              }))}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="categoryId"
+            label={intl.formatMessage({ id: 'posts.category' })}
+            rules={[
+              {
+                required: true,
+                message: intl.formatMessage({ id: 'posts.form.category.required' }),
+              },
+            ]}
+          >
+            <Select
+              placeholder={intl.formatMessage({ id: 'posts.form.tags.placeholder' })}
+              style={{ width: '100%' }}
+              options={(categoryListQuery.data || []).map((category) => ({
+                value: String(category.id),
+                label: category.name,
               }))}
             />
           </Form.Item>
