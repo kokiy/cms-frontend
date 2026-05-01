@@ -12,6 +12,7 @@ import {
   tagsControllerFindAll,
   type CreatePostDto,
   type UpdatePostDto,
+  type PostResponseDto,
 } from '@/services'
 
 const { Search } = Input
@@ -21,7 +22,7 @@ export function PostsPage() {
   const queryClient = useQueryClient()
   const [form] = Form.useForm()
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [editingPost, setEditingPost] = useState<{ id: number; [key: string]: any } | null>(null)
+  const [editingPost, setEditingPost] = useState<PostResponseDto | null>(null)
   const [keyword, setKeyword] = useState('')
   const [page, setPage] = useState(1)
 
@@ -60,7 +61,7 @@ export function PostsPage() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: UpdatePostDto }) => {
+    mutationFn: async ({ id, data }: { id: string; data: UpdatePostDto }) => {
       await postsControllerUpdate({
         path: { id },
         body: data,
@@ -74,7 +75,7 @@ export function PostsPage() {
   })
 
   const publishMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       await postsControllerPublish({
         path: { id },
         throwOnError: true,
@@ -87,7 +88,7 @@ export function PostsPage() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       await postsControllerRemove({
         path: { id },
         throwOnError: true,
@@ -105,18 +106,18 @@ export function PostsPage() {
     setIsDrawerOpen(true)
   }
 
-  const handleEdit = (post: { id: number; [key: string]: any }) => {
+  const handleEdit = (post: PostResponseDto) => {
     setEditingPost(post)
     form.setFieldsValue({
       title: post.title,
       content: post.content,
-      tags: post.tags || [],
-      categoryId: post.categoryId,
+      tags: post.tags?.map((tag) => tag.id) || [],
+      categoryId: post.category_id,
     })
     setIsDrawerOpen(true)
   }
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     deleteMutation.mutate(id, {
       onSuccess: () => {
         notification.success({
@@ -126,7 +127,7 @@ export function PostsPage() {
     })
   }
 
-  const handlePublish = (id: number) => {
+  const handlePublish = (id: string) => {
     publishMutation.mutate(id, {
       onSuccess: () => {
         notification.success({
@@ -193,7 +194,7 @@ export function PostsPage() {
     {
       title: intl.formatMessage({ id: 'posts.table.actions' }),
       key: 'actions',
-      render: (_: any, record: { id: number; status: string; [key: string]: any }) => (
+      render: (_: unknown, record: PostResponseDto) => (
         <Space>
           <Button type="text" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
             {intl.formatMessage({ id: 'common.edit' })}

@@ -1,8 +1,8 @@
-import { useState } from 'react'
 import { Form, Input, Button, Card, notification, Typography } from 'antd'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { authControllerLogin, type LoginDto } from '@/services'
+import { useMutation } from '@tanstack/react-query'
+import { authControllerRegister, type CreateUserDto } from '@/services'
 import { storeSelector } from '@/stores'
 
 const { Link } = Typography
@@ -10,38 +10,43 @@ const { Link } = Typography
 export function RegisterPage() {
   const intl = useIntl()
   const navigate = useNavigate()
-  const [loading, setLoading] = useState(false)
   const [form] = Form.useForm()
   const setToken = storeSelector.use.setToken()
+  const setUser = storeSelector.use.setUser()
 
-  const onFinish = async (
-    values: LoginDto & {
-      confirmPassword: string
-    },
-  ) => {
-    setLoading(true)
-    try {
-      const response = await authControllerLogin({
-        body: { username: values.username, password: values.password },
+  const registerMutation = useMutation({
+    mutationFn: async (values: { username: string; password: string }) => {
+      const response = await authControllerRegister({
+        body: values,
         throwOnError: true,
       })
-
-      setToken(response.data.data.access_token)
-      // setUser(user)
+      if (response.data.data?.access_token) {
+        setToken(response.data.data.access_token)
+        setUser({ username: response.data.data.username, id: 'a' })
+      }
+    },
+    onSuccess: () => {
       notification.success({
         message: intl.formatMessage({ id: 'register.success' }),
       })
       setTimeout(() => {
         navigate('/posts')
       }, 500)
-    } catch (error) {
+    },
+    onError: (error) => {
       notification.error({
         message: intl.formatMessage({ id: 'register.failed' }),
         description: error instanceof Error ? error.message : undefined,
       })
-    } finally {
-      setLoading(false)
-    }
+    },
+  })
+
+  const onFinish = (
+    values: CreateUserDto & {
+      confirmPassword: string
+    },
+  ) => {
+    registerMutation.mutate({ username: values.username, password: values.password })
   }
 
   return (
@@ -111,7 +116,7 @@ export function RegisterPage() {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" block loading={loading}>
+            <Button type="primary" htmlType="submit" block loading={registerMutation.isPending}>
               {intl.formatMessage({ id: 'register.submit' })}
             </Button>
           </Form.Item>

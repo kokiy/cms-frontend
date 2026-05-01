@@ -72,29 +72,6 @@ export type LoginDto = {
   password: string
 }
 
-export type UserResponseDto = {
-  /**
-   * 用户ID
-   */
-  id: number
-  /**
-   * 用户名
-   */
-  username: string
-  /**
-   * 用户角色
-   */
-  role: 'admin' | 'editor'
-  /**
-   * 创建时间
-   */
-  created_at: string
-  /**
-   * 更新时间
-   */
-  updated_at: string
-}
-
 export type CreateUserDto = {
   /**
    * 用户名
@@ -107,7 +84,30 @@ export type CreateUserDto = {
   /**
    * 用户角色
    */
-  role?: 'admin' | 'editor'
+  role?: 'ADMIN' | 'EDITOR'
+}
+
+export type UserResponseDto = {
+  /**
+   * 用户ID
+   */
+  id: string
+  /**
+   * 用户名
+   */
+  username: string
+  /**
+   * 用户角色
+   */
+  role: 'ADMIN' | 'EDITOR'
+  /**
+   * 创建时间
+   */
+  created_at: string
+  /**
+   * 更新时间
+   */
+  updated_at: string
 }
 
 export type UpdateUserDto = {
@@ -122,7 +122,7 @@ export type UpdateUserDto = {
   /**
    * 用户角色
    */
-  role?: 'admin' | 'editor'
+  role?: 'ADMIN' | 'EDITOR'
 }
 
 export type CategoryResponseDto = {
@@ -159,7 +159,7 @@ export type PostResponseDto = {
   /**
    * 文章ID
    */
-  id: number
+  id: string
   /**
    * 文章标题
    */
@@ -177,7 +177,7 @@ export type PostResponseDto = {
   /**
    * 文章状态
    */
-  status: 'draft' | 'published'
+  status: 'DRAFT' | 'PUBLISHED'
   /**
    * 作者ID
    */
@@ -236,11 +236,11 @@ export type CreatePostDto = {
   /**
    * 分类 ID
    */
-  category_id?: number
+  categoryId?: string
   /**
    * 标签名称列表
    */
-  tag_names?: Array<string>
+  tags?: Array<string>
 }
 
 export type UpdatePostDto = {
@@ -259,11 +259,11 @@ export type UpdatePostDto = {
   /**
    * 分类 ID
    */
-  category_id?: number
+  categoryId?: string
   /**
    * 标签名称列表
    */
-  tag_names?: Array<string>
+  tags?: Array<string>
 }
 
 export type CreateTagDto = {
@@ -305,6 +305,17 @@ export type AppControllerGetHelloResponses = {
   200: unknown
 }
 
+export type AppControllerGetHealthData = {
+  body?: never
+  path?: never
+  query?: never
+  url: '/health'
+}
+
+export type AppControllerGetHealthResponses = {
+  200: unknown
+}
+
 export type AuthControllerLoginData = {
   body: LoginDto
   path?: never
@@ -320,6 +331,22 @@ export type AuthControllerLoginResponses = {
 
 export type AuthControllerLoginResponse =
   AuthControllerLoginResponses[keyof AuthControllerLoginResponses]
+
+export type AuthControllerRegisterData = {
+  body: CreateUserDto
+  path?: never
+  query?: never
+  url: '/api/v1/auth/register'
+}
+
+export type AuthControllerRegisterResponses = {
+  200: ApiResponseDto & {
+    data?: LoginResponseDto
+  }
+}
+
+export type AuthControllerRegisterResponse =
+  AuthControllerRegisterResponses[keyof AuthControllerRegisterResponses]
 
 export type UsersControllerFindAllData = {
   body?: never
@@ -356,7 +383,7 @@ export type UsersControllerCreateResponse =
 export type UsersControllerRemoveData = {
   body?: never
   path: {
-    id: number
+    id: string
   }
   query?: never
   url: '/api/v1/users/{id}'
@@ -374,7 +401,7 @@ export type UsersControllerRemoveResponse =
 export type UsersControllerFindOneData = {
   body?: never
   path: {
-    id: number
+    id: string
   }
   query?: never
   url: '/api/v1/users/{id}'
@@ -392,7 +419,7 @@ export type UsersControllerFindOneResponse =
 export type UsersControllerUpdateData = {
   body: UpdateUserDto
   path: {
-    id: number
+    id: string
   }
   query?: never
   url: '/api/v1/users/{id}'
@@ -422,11 +449,11 @@ export type PostsControllerFindAllData = {
     /**
      * 分类 ID
      */
-    category_id?: number
+    categoryId?: string
     /**
      * 标签 ID
      */
-    tag_id?: number
+    tagId?: string
     /**
      * 搜索关键词
      */
@@ -477,11 +504,11 @@ export type PostsControllerFindAllManageData = {
     /**
      * 分类 ID
      */
-    category_id?: number
+    categoryId?: string
     /**
      * 标签 ID
      */
-    tag_id?: number
+    tagId?: string
     /**
      * 搜索关键词
      */
@@ -504,7 +531,7 @@ export type PostsControllerFindAllManageResponse =
 export type PostsControllerRemoveData = {
   body?: never
   path: {
-    id: number
+    id: string
   }
   query?: never
   url: '/api/v1/posts/{id}'
@@ -522,7 +549,7 @@ export type PostsControllerRemoveResponse =
 export type PostsControllerFindOneData = {
   body?: never
   path: {
-    id: number
+    id: string
   }
   query?: never
   url: '/api/v1/posts/{id}'
@@ -540,7 +567,7 @@ export type PostsControllerFindOneResponse =
 export type PostsControllerUpdateData = {
   body: UpdatePostDto
   path: {
-    id: number
+    id: string
   }
   query?: never
   url: '/api/v1/posts/{id}'
@@ -558,7 +585,7 @@ export type PostsControllerUpdateResponse =
 export type PostsControllerPublishData = {
   body?: never
   path: {
-    id: number
+    id: string
   }
   query?: never
   url: '/api/v1/posts/{id}/publish'
@@ -608,7 +635,7 @@ export type TagsControllerCreateResponse =
 export type TagsControllerRemoveData = {
   body?: never
   path: {
-    id: number
+    id: string
   }
   query?: never
   url: '/api/v1/tags/{id}'
@@ -626,7 +653,7 @@ export type TagsControllerRemoveResponse =
 export type TagsControllerUpdateData = {
   body: UpdateTagDto
   path: {
-    id: number
+    id: string
   }
   query?: never
   url: '/api/v1/tags/{id}'
@@ -676,7 +703,7 @@ export type CategoriesControllerCreateResponse =
 export type CategoriesControllerRemoveData = {
   body?: never
   path: {
-    id: number
+    id: string
   }
   query?: never
   url: '/api/v1/categories/{id}'
@@ -694,7 +721,7 @@ export type CategoriesControllerRemoveResponse =
 export type CategoriesControllerUpdateData = {
   body: UpdateCategoryDto
   path: {
-    id: number
+    id: string
   }
   query?: never
   url: '/api/v1/categories/{id}'

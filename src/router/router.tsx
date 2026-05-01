@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { LoginPage } from '../pages/login/LoginPage'
-import { RegisterPage } from '../pages/login/RegisterPage'
+import { RegisterPage } from '../pages/register/RegisterPage'
 import { PostsPage } from '../pages/posts/PostsPage'
 import { TagsPage } from '../pages/tags/TagsPage'
 import { MainLayout } from '../components/layout'

@@ -3,10 +3,14 @@
 import type { Client, Options as Options2, TDataShape } from './client'
 import { client } from './client.gen'
 import type {
+  AppControllerGetHealthData,
+  AppControllerGetHealthResponses,
   AppControllerGetHelloData,
   AppControllerGetHelloResponses,
   AuthControllerLoginData,
   AuthControllerLoginResponses,
+  AuthControllerRegisterData,
+  AuthControllerRegisterResponses,
   CategoriesControllerCreateData,
   CategoriesControllerCreateResponses,
   CategoriesControllerFindAllData,
@@ -66,11 +70,25 @@ export type Options<
   meta?: Record<string, unknown>
 }
 
+/**
+ * 应用根路径
+ */
 export const appControllerGetHello = <ThrowOnError extends boolean = false>(
   options?: Options<AppControllerGetHelloData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<AppControllerGetHelloResponses, unknown, ThrowOnError>({
     url: '/api/v1',
+    ...options,
+  })
+
+/**
+ * 健康检查
+ */
+export const appControllerGetHealth = <ThrowOnError extends boolean = false>(
+  options?: Options<AppControllerGetHealthData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<AppControllerGetHealthResponses, unknown, ThrowOnError>({
+    url: '/health',
     ...options,
   })
 
@@ -82,6 +100,21 @@ export const authControllerLogin = <ThrowOnError extends boolean = false>(
 ) =>
   (options.client ?? client).post<AuthControllerLoginResponses, unknown, ThrowOnError>({
     url: '/api/v1/auth/login',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+
+/**
+ * 用户注册
+ */
+export const authControllerRegister = <ThrowOnError extends boolean = false>(
+  options: Options<AuthControllerRegisterData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<AuthControllerRegisterResponses, unknown, ThrowOnError>({
+    url: '/api/v1/auth/register',
     ...options,
     headers: {
       'Content-Type': 'application/json',

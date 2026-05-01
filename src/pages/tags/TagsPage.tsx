@@ -10,6 +10,7 @@ import {
   tagsControllerRemove,
   type CreateTagDto,
   type UpdateTagDto,
+  type TagResponseDto,
 } from '@/services'
 
 export function TagsPage() {
@@ -17,7 +18,7 @@ export function TagsPage() {
   const queryClient = useQueryClient()
   const [form] = Form.useForm()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingTag, setEditingTag] = useState<{ id: number; name: string } | null>(null)
+  const [editingTag, setEditingTag] = useState<TagResponseDto | null>(null)
 
   const tagListQuery = useQuery({
     queryKey: ['tags'],
@@ -43,7 +44,7 @@ export function TagsPage() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: UpdateTagDto }) => {
+    mutationFn: async ({ id, data }: { id: string; data: UpdateTagDto }) => {
       await tagsControllerUpdate({
         path: { id },
         body: data,
@@ -57,7 +58,7 @@ export function TagsPage() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       await tagsControllerRemove({
         path: { id },
         throwOnError: true,
@@ -75,13 +76,13 @@ export function TagsPage() {
     setIsModalOpen(true)
   }
 
-  const handleEdit = (tag: { id: number; name: string }) => {
+  const handleEdit = (tag: TagResponseDto) => {
     setEditingTag(tag)
     form.setFieldsValue({ name: tag.name })
     setIsModalOpen(true)
   }
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     deleteMutation.mutate(id, {
       onSuccess: () => {
         notification.success({
@@ -136,7 +137,7 @@ export function TagsPage() {
     {
       title: intl.formatMessage({ id: 'tags.table.actions' }),
       key: 'actions',
-      render: (_: any, record: { id: number; name: string }) => (
+      render: (_: unknown, record: TagResponseDto) => (
         <Space>
           <Button type="text" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
             {intl.formatMessage({ id: 'common.edit' })}
