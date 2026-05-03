@@ -15,17 +15,17 @@ export function Sidebar() {
 
   const menuItems = [
     {
-      key: '/posts',
+      key: '/admin/posts',
       icon: <BookOutlined />,
       label: intl.formatMessage({ id: 'common.posts' }),
     },
     {
-      key: '/tags',
+      key: '/admin/tags',
       icon: <TagsOutlined />,
       label: intl.formatMessage({ id: 'common.tags' }),
     },
     {
-      key: '/categories',
+      key: '/admin/categories',
       icon: <FolderOutlined />,
       label: intl.formatMessage({ id: 'common.categories' }),
     },

@@ -27,7 +27,7 @@ export function RegisterPage() {
     },
     onSuccess: () => {
       notification.success({
-        message: intl.formatMessage({ id: 'register.success' }),
+        title: intl.formatMessage({ id: 'register.success' }),
       })
       setTimeout(() => {
         navigate('/posts')
@@ -35,7 +35,7 @@ export function RegisterPage() {
     },
     onError: (error) => {
       notification.error({
-        message: intl.formatMessage({ id: 'register.failed' }),
+        title: intl.formatMessage({ id: 'register.failed' }),
         description: error instanceof Error ? error.message : undefined,
       })
     },

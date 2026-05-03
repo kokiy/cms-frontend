@@ -15,6 +15,7 @@ export default {
   'tags.postCount': 'Post Count',
   'tags.table.name': 'Tag Name',
   'tags.table.postCount': 'Post Count',
+  'tags.table.createdAt': 'Created At',
   'tags.table.actions': 'Actions',
   'tags.createdAt': 'Created At',
   'tags.noData': 'No tags',

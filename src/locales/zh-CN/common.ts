@@ -18,6 +18,7 @@ export default {
   'common.chinese': '简体中文',
   'common.english': 'English',
   'common.logout': '退出登录',
+  'common.logout.confirm': '确定要退出登录吗？',
   'common.user': '用户',
   'common.home': '首页',
   'common.posts': '文章管理',

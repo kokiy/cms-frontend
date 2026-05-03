@@ -3,6 +3,7 @@ import { Table, Button, Modal, Form, Input, Popconfirm, Space, notification } fr
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useIntl } from 'react-intl'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import {
   tagsControllerFindAll,
   tagsControllerCreate,
@@ -86,7 +87,7 @@ export function TagsPage() {
     deleteMutation.mutate(id, {
       onSuccess: () => {
         notification.success({
-          message: intl.formatMessage({ id: 'tags.delete.success' }),
+          title: intl.formatMessage({ id: 'tags.delete.success' }),
         })
       },
     })
@@ -101,7 +102,7 @@ export function TagsPage() {
           {
             onSuccess: () => {
               notification.success({
-                message: intl.formatMessage({ id: 'tags.update.success' }),
+                title: intl.formatMessage({ id: 'tags.update.success' }),
               })
               setIsModalOpen(false)
             },
@@ -111,7 +112,7 @@ export function TagsPage() {
         createMutation.mutate(values, {
           onSuccess: () => {
             notification.success({
-              message: intl.formatMessage({ id: 'tags.create.success' }),
+              title: intl.formatMessage({ id: 'tags.create.success' }),
             })
             setIsModalOpen(false)
           },
@@ -129,10 +130,13 @@ export function TagsPage() {
       key: 'name',
     },
     {
-      title: intl.formatMessage({ id: 'tags.table.postCount' }),
-      dataIndex: 'postCount',
-      key: 'postCount',
-      default: 0,
+      title: intl.formatMessage({ id: 'tags.table.createdAt' }),
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (date: string) => {
+        const parsed = dayjs(date)
+        return parsed.isValid() ? parsed.format('YYYY-MM-DD HH:mm:ss') : '-'
+      },
     },
     {
       title: intl.formatMessage({ id: 'tags.table.actions' }),

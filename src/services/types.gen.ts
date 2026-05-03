@@ -103,11 +103,11 @@ export type UserResponseDto = {
   /**
    * 创建时间
    */
-  created_at: string
+  createdAt: string
   /**
    * 更新时间
    */
-  updated_at: string
+  updatedAt: string
 }
 
 export type UpdateUserDto = {
@@ -129,7 +129,7 @@ export type CategoryResponseDto = {
   /**
    * 分类ID
    */
-  id: number
+  id: string
   /**
    * 分类名称
    */
@@ -137,14 +137,14 @@ export type CategoryResponseDto = {
   /**
    * 创建时间
    */
-  created_at: string
+  createdAt: string
 }
 
 export type TagResponseDto = {
   /**
    * 标签ID
    */
-  id: number
+  id: string
   /**
    * 标签名称
    */
@@ -152,7 +152,7 @@ export type TagResponseDto = {
   /**
    * 创建时间
    */
-  created_at: string
+  createdAt: string
 }
 
 export type PostResponseDto = {
@@ -181,31 +181,31 @@ export type PostResponseDto = {
   /**
    * 作者ID
    */
-  author_id: number
+  authorId: string
   /**
    * 分类ID
    */
-  category_id: {
+  categoryId: {
     [key: string]: unknown
   } | null
   /**
    * 浏览次数
    */
-  view_count: number
+  viewCount: number
   /**
    * 发布时间
    */
-  published_at: {
+  publishedAt: {
     [key: string]: unknown
   } | null
   /**
    * 创建时间
    */
-  created_at: string
+  createdAt: string
   /**
    * 更新时间
    */
-  updated_at: string
+  updatedAt: string
   /**
    * 作者信息
    */

@@ -15,6 +15,7 @@ export default {
   'categories.postCount': '文章数',
   'categories.table.name': '分类名称',
   'categories.table.postCount': '文章数',
+  'categories.table.createdAt': '创建时间',
   'categories.table.actions': '操作',
   'categories.createdAt': '创建时间',
   'categories.noData': '暂无分类',

@@ -25,7 +25,7 @@ export function LoginPage() {
     },
     onSuccess: () => {
       notification.success({
-        message: intl.formatMessage({ id: 'login.success' }),
+        title: intl.formatMessage({ id: 'login.success' }),
       })
       setTimeout(() => {
         navigate('/posts')
@@ -33,7 +33,7 @@ export function LoginPage() {
     },
     onError: (error) => {
       notification.error({
-        message: intl.formatMessage({ id: 'login.failed' }),
+        title: intl.formatMessage({ id: 'login.failed' }),
         description: error instanceof Error ? error.message : undefined,
       })
     },

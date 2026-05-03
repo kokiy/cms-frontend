@@ -1,5 +1,17 @@
 import { useState } from 'react'
-import { Table, Button, Input, Select, Space, Tag, Form, Drawer, notification } from 'antd'
+import {
+  Table,
+  Button,
+  Input,
+  Select,
+  Space,
+  Tag,
+  Form,
+  Drawer,
+  notification,
+  Popconfirm,
+  Modal,
+} from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useIntl } from 'react-intl'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -29,6 +41,8 @@ export function PostsPage() {
   const [editingPost, setEditingPost] = useState<PostResponseDto | null>(null)
   const [keyword, setKeyword] = useState('')
   const [page, setPage] = useState(1)
+  const [isDirty, setIsDirty] = useState(false)
+  const [isCloseConfirmOpen, setIsCloseConfirmOpen] = useState(false)
 
   const postListQuery = useQuery({
     queryKey: ['posts', { keyword }],
@@ -128,33 +142,69 @@ export function PostsPage() {
   })
 
   const handleAdd = () => {
-    setEditingPost(null)
-    form.resetFields()
-    setIsDrawerOpen(true)
+    if (isDirty) {
+      setIsCloseConfirmOpen(true)
+    } else {
+      setEditingPost(null)
+      form.resetFields()
+      setIsDirty(false)
+      setIsDrawerOpen(true)
+    }
   }
 
   const handleEdit = (post: PostResponseDto) => {
     if (post.status === 'PUBLISHED') {
       notification.warning({
-        message: '已发布的文章不能编辑',
+        title: '已发布的文章不能编辑',
       })
       return
     }
-    setEditingPost(post)
-    form.setFieldsValue({
-      title: post.title,
-      content: post.content,
-      tags: post.tags?.map((tag) => tag.id) || [],
-      categoryId: post.category_id,
-    })
-    setIsDrawerOpen(true)
+    if (isDirty) {
+      setIsCloseConfirmOpen(true)
+    } else {
+      setEditingPost(post)
+      form.setFieldsValue({
+        title: post.title,
+        content: post.content,
+        tags: post.tags?.map((tag) => tag.id) || [],
+        categoryId: post.category ? post.category.id : undefined,
+      })
+      setIsDirty(false)
+      setIsDrawerOpen(true)
+    }
+  }
+
+  const handleCloseDrawer = () => {
+    if (isDirty) {
+      setIsCloseConfirmOpen(true)
+    } else {
+      setIsDrawerOpen(false)
+      setEditingPost(null)
+      form.resetFields()
+    }
+  }
+
+  const confirmClose = () => {
+    setIsCloseConfirmOpen(false)
+    setIsDrawerOpen(false)
+    setIsDirty(false)
+    setEditingPost(null)
+    form.resetFields()
+  }
+
+  const cancelClose = () => {
+    setIsCloseConfirmOpen(false)
+  }
+
+  const handleFormChange = () => {
+    setIsDirty(true)
   }
 
   const handleDelete = (id: string) => {
     deleteMutation.mutate(id, {
       onSuccess: () => {
         notification.success({
-          message: intl.formatMessage({ id: 'posts.delete.success' }),
+          title: intl.formatMessage({ id: 'posts.delete.success' }),
         })
       },
     })
@@ -164,7 +214,7 @@ export function PostsPage() {
     publishMutation.mutate(id, {
       onSuccess: () => {
         notification.success({
-          message: intl.formatMessage({ id: 'posts.publish.success' }),
+          title: intl.formatMessage({ id: 'posts.publish.success' }),
         })
       },
     })
@@ -174,7 +224,7 @@ export function PostsPage() {
     unpublishMutation.mutate(id, {
       onSuccess: () => {
         notification.success({
-          message: intl.formatMessage({ id: 'posts.unpublish.success' }),
+          title: intl.formatMessage({ id: 'posts.unpublish.success' }),
         })
       },
     })
@@ -183,25 +233,40 @@ export function PostsPage() {
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields()
+      // 将标签 ID 转换为标签名称
+      const tagNames = (values.tags || [])
+        .map((tagId: any) => {
+          const tag = tagListQuery.data?.find((t) => t.id === tagId)
+          return tag?.name || ''
+        })
+        .filter(Boolean)
+
+      const submitData = {
+        ...values,
+        tags: tagNames,
+      }
+
       if (editingPost) {
         updateMutation.mutate(
-          { id: editingPost.id, data: values },
+          { id: editingPost.id, data: submitData },
           {
             onSuccess: () => {
               notification.success({
-                message: intl.formatMessage({ id: 'posts.update.success' }),
+                title: intl.formatMessage({ id: 'posts.update.success' }),
               })
               setIsDrawerOpen(false)
+              setIsDirty(false)
             },
           },
         )
       } else {
-        createMutation.mutate(values, {
+        createMutation.mutate(submitData, {
           onSuccess: () => {
             notification.success({
-              message: intl.formatMessage({ id: 'posts.create.success' }),
+              title: intl.formatMessage({ id: 'posts.create.success' }),
             })
             setIsDrawerOpen(false)
+            setIsDirty(false)
           },
         })
       }
@@ -237,8 +302,17 @@ export function PostsPage() {
     },
     {
       title: intl.formatMessage({ id: 'posts.table.createdAt' }),
-      dataIndex: 'created_at',
+      dataIndex: 'createdAt',
       key: 'createdAt',
+      render: (date: string) => {
+        const parsed = dayjs(date)
+        return parsed.isValid() ? parsed.format('YYYY-MM-DD HH:mm:ss') : '-'
+      },
+    },
+    {
+      title: intl.formatMessage({ id: 'posts.table.updatedAt' }),
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
       render: (date: string) => {
         const parsed = dayjs(date)
         return parsed.isValid() ? parsed.format('YYYY-MM-DD HH:mm:ss') : '-'
@@ -255,32 +329,39 @@ export function PostsPage() {
             </Button>
           )}
           {record.status === 'DRAFT' && (
-            <Button
-              type="text"
-              onClick={() => handlePublish(record.id)}
-              loading={publishMutation.isPending}
+            <Popconfirm
+              title={intl.formatMessage({ id: 'posts.publish.confirm' })}
+              onConfirm={() => handlePublish(record.id)}
+              okText={intl.formatMessage({ id: 'common.confirm' })}
+              cancelText={intl.formatMessage({ id: 'common.cancel' })}
             >
-              {intl.formatMessage({ id: 'posts.publish' })}
-            </Button>
+              <Button type="text" loading={publishMutation.isPending}>
+                {intl.formatMessage({ id: 'posts.publish' })}
+              </Button>
+            </Popconfirm>
           )}
           {record.status === 'PUBLISHED' && (
-            <Button
-              type="text"
-              onClick={() => handleUnpublish(record.id)}
-              loading={unpublishMutation.isPending}
+            <Popconfirm
+              title={intl.formatMessage({ id: 'posts.unpublish.confirm' })}
+              onConfirm={() => handleUnpublish(record.id)}
+              okText={intl.formatMessage({ id: 'common.confirm' })}
+              cancelText={intl.formatMessage({ id: 'common.cancel' })}
             >
-              {intl.formatMessage({ id: 'posts.unpublish' })}
-            </Button>
+              <Button type="text" loading={unpublishMutation.isPending}>
+                {intl.formatMessage({ id: 'posts.unpublish' })}
+              </Button>
+            </Popconfirm>
           )}
-          <Button
-            type="text"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.id)}
-            loading={deleteMutation.isPending}
+          <Popconfirm
+            title={intl.formatMessage({ id: 'posts.delete.confirm' })}
+            onConfirm={() => handleDelete(record.id)}
+            okText={intl.formatMessage({ id: 'common.confirm' })}
+            cancelText={intl.formatMessage({ id: 'common.cancel' })}
           >
-            {intl.formatMessage({ id: 'common.delete' })}
-          </Button>
+            <Button type="text" danger icon={<DeleteOutlined />} loading={deleteMutation.isPending}>
+              {intl.formatMessage({ id: 'common.delete' })}
+            </Button>
+          </Popconfirm>
         </Space>
       ),
     },
@@ -323,10 +404,10 @@ export function PostsPage() {
         }
         size={'80vw'}
         open={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
+        onClose={handleCloseDrawer}
         extra={
           <Space>
-            <Button onClick={() => setIsDrawerOpen(false)}>
+            <Button onClick={handleCloseDrawer}>
               {intl.formatMessage({ id: 'common.cancel' })}
             </Button>
             <Button
@@ -341,7 +422,7 @@ export function PostsPage() {
           </Space>
         }
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} layout="vertical" onValuesChange={handleFormChange}>
           <Form.Item
             name="title"
             label={intl.formatMessage({ id: 'posts.form.title' })}
@@ -406,13 +487,24 @@ export function PostsPage() {
               placeholder={intl.formatMessage({ id: 'posts.form.tags.placeholder' })}
               style={{ width: '100%' }}
               options={(categoryListQuery.data || []).map((category) => ({
-                value: String(category.id),
+                value: category.id,
                 label: category.name,
               }))}
             />
           </Form.Item>
         </Form>
       </Drawer>
+
+      <Modal
+        title={intl.formatMessage({ id: 'common.confirm' })}
+        open={isCloseConfirmOpen}
+        onOk={confirmClose}
+        onCancel={cancelClose}
+        okText={intl.formatMessage({ id: 'common.confirm' })}
+        cancelText={intl.formatMessage({ id: 'common.cancel' })}
+      >
+        <p>{intl.formatMessage({ id: 'posts.unsavedChanges' })}</p>
+      </Modal>
     </div>
   )
 }

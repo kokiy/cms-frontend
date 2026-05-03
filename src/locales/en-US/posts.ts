@@ -34,10 +34,15 @@ export default {
   'posts.table.title': 'Title',
   'posts.table.status': 'Status',
   'posts.table.createdAt': 'Created At',
+  'posts.table.updatedAt': 'Updated At',
   'posts.table.actions': 'Actions',
   'posts.updatedAt': 'Updated At',
   'posts.noData': 'No posts',
   'posts.deleteConfirm': 'Are you sure you want to delete this post?',
+  'posts.delete.confirm':
+    'Are you sure you want to delete this post? This action cannot be undone.',
+  'posts.publish.confirm': 'Are you sure you want to publish this post?',
+  'posts.unpublish.confirm': 'Are you sure you want to unpublish this post?',
   'posts.saveSuccess': 'Post saved successfully',
   'posts.create.success': 'Post created successfully',
   'posts.update.success': 'Post updated successfully',
@@ -45,4 +50,5 @@ export default {
   'posts.publish.success': 'Post published successfully',
   'posts.deleteSuccess': 'Post deleted successfully',
   'posts.delete.success': 'Post deleted successfully',
+  'posts.unsavedChanges': 'You have unsaved changes. Are you sure you want to close?',
 }

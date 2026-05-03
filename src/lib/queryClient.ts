@@ -1,5 +1,4 @@
 import { QueryClient } from '@tanstack/react-query'
-import { notification } from 'antd'
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -15,13 +14,7 @@ export const queryClient = new QueryClient({
       },
     },
     mutations: {
-      onError: (error: { message?: string }) => {
-        const message = error.message || 'An error occurred'
-        notification.error({
-          message: 'Error',
-          description: message,
-        })
-      },
+      // 错误处理已在 API client 拦截器中统一处理，避免重复弹窗
     },
   },
 })

@@ -15,6 +15,7 @@ export default {
   'tags.postCount': '文章数',
   'tags.table.name': '标签名称',
   'tags.table.postCount': '文章数',
+  'tags.table.createdAt': '创建时间',
   'tags.table.actions': '操作',
   'tags.createdAt': '创建时间',
   'tags.noData': '暂无标签',

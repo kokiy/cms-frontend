@@ -19,6 +19,7 @@ export default {
   'common.chinese': '简体中文',
   'common.english': 'English',
   'common.logout': 'Logout',
+  'common.logout.confirm': 'Are you sure you want to logout?',
   'common.user': 'User',
   'common.home': 'Home',
   'common.posts': 'Posts',

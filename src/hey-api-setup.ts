@@ -17,7 +17,7 @@ export const setupApiClient = () => {
       storeSelector.getState().clearAuth()
       window.location.href = '/login'
       notification.error({
-        message: 'Session expired',
+        title: 'Session expired',
         description: 'Please login again',
       })
     }
@@ -25,11 +25,27 @@ export const setupApiClient = () => {
   })
 
   client.interceptors.error.use(async (error) => {
-    const message =
-      error instanceof Error ? error.message : 'An error occurred while making the request'
+    let errorMessage = 'An error occurred while making the request'
+
+    // 尝试从错误响应中获取更详细的错误信息
+    if (error && typeof error === 'object') {
+      // @ts-ignore - 检查是否有 response 数据
+      if (error.response) {
+        // @ts-ignore
+        const responseData = error.response.data
+        if (responseData && responseData.message) {
+          errorMessage = responseData.message
+        } else if (responseData && typeof responseData === 'string') {
+          errorMessage = responseData
+        }
+      } else if (error instanceof Error && error.message) {
+        errorMessage = error.message
+      }
+    }
+
     notification.error({
-      message: 'Error',
-      description: message,
+      title: 'Error',
+      description: errorMessage,
     })
     return error
   })

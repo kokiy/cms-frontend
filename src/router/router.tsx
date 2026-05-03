@@ -5,6 +5,9 @@ import { PostsPage } from '../pages/posts/PostsPage'
 import { TagsPage } from '../pages/tags/TagsPage'
 import { CategoriesPage } from '../pages/categories/CategoriesPage'
 import { MainLayout } from '../components/layout'
+import { FrontendLayout } from '../components/layout/FrontendLayout'
+import { HomePage } from '../pages/home/HomePage'
+import { PostDetailPage } from '../pages/post/PostDetailPage'
 import { ProtectedRoute } from './ProtectedRoute'
 import { storeSelector } from '../stores'
 
@@ -14,15 +17,29 @@ export function useAppRouter() {
 
   return createBrowserRouter([
     {
+      path: '/',
+      element: <FrontendLayout />,
+      children: [
+        {
+          index: true,
+          element: <HomePage />,
+        },
+        {
+          path: 'post/:id',
+          element: <PostDetailPage />,
+        },
+      ],
+    },
+    {
       path: '/login',
-      element: isAuthenticated ? <Navigate to="/posts" replace /> : <LoginPage />,
+      element: isAuthenticated ? <Navigate to="/admin" replace /> : <LoginPage />,
     },
     {
       path: '/register',
-      element: isAuthenticated ? <Navigate to="/posts" replace /> : <RegisterPage />,
+      element: isAuthenticated ? <Navigate to="/admin" replace /> : <RegisterPage />,
     },
     {
-      path: '/',
+      path: '/admin',
       element: (
         <ProtectedRoute>
           <MainLayout />
@@ -31,7 +48,7 @@ export function useAppRouter() {
       children: [
         {
           index: true,
-          element: <Navigate to="/posts" replace />,
+          element: <Navigate to="/admin/posts" replace />,
         },
         {
           path: 'posts',

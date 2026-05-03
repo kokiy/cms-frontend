@@ -15,6 +15,7 @@ export default {
   'categories.postCount': 'Post Count',
   'categories.table.name': 'Category Name',
   'categories.table.postCount': 'Post Count',
+  'categories.table.createdAt': 'Created At',
   'categories.table.actions': 'Actions',
   'categories.createdAt': 'Created At',
   'categories.noData': 'No categories',

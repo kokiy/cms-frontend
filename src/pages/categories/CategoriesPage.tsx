@@ -3,6 +3,7 @@ import { Table, Button, Modal, Form, Input, Popconfirm, Space, notification } fr
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useIntl } from 'react-intl'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import {
   categoriesControllerFindAll,
   categoriesControllerCreate,
@@ -86,7 +87,7 @@ export function CategoriesPage() {
     deleteMutation.mutate(id, {
       onSuccess: () => {
         notification.success({
-          message: intl.formatMessage({ id: 'categories.delete.success' }),
+          title: intl.formatMessage({ id: 'categories.delete.success' }),
         })
       },
     })
@@ -101,7 +102,7 @@ export function CategoriesPage() {
           {
             onSuccess: () => {
               notification.success({
-                message: intl.formatMessage({ id: 'categories.update.success' }),
+                title: intl.formatMessage({ id: 'categories.update.success' }),
               })
               setIsModalOpen(false)
             },
@@ -111,7 +112,7 @@ export function CategoriesPage() {
         createMutation.mutate(values, {
           onSuccess: () => {
             notification.success({
-              message: intl.formatMessage({ id: 'categories.create.success' }),
+              title: intl.formatMessage({ id: 'categories.create.success' }),
             })
             setIsModalOpen(false)
           },
@@ -129,10 +130,13 @@ export function CategoriesPage() {
       key: 'name',
     },
     {
-      title: intl.formatMessage({ id: 'categories.table.postCount' }),
-      dataIndex: 'postCount',
-      key: 'postCount',
-      default: 0,
+      title: intl.formatMessage({ id: 'categories.table.createdAt' }),
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (date: string) => {
+        const parsed = dayjs(date)
+        return parsed.isValid() ? parsed.format('YYYY-MM-DD HH:mm:ss') : '-'
+      },
     },
     {
       title: intl.formatMessage({ id: 'categories.table.actions' }),
